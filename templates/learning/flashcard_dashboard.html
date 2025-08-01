@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.07); padding: 1.5rem; }
+        .ai-insight { background-color: #f0f5ff; border-left: 4px solid #1d4ed8; padding: 1rem; margin-top: 1rem; border-radius: 0.25rem; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    {% include 'partials/navbar.html' %}
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">Flashcard Center</h1>
+            <p class="text-lg text-gray-600 mt-1">Strengthen your memory with intelligent, daily reviews.</p>
+        </header>
+
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Your AI Review Decks for Today</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-xl font-semibold text-gray-800">Memory Strength Review</h3>
+                    <p class="text-gray-600 mt-1">Cards due for review based on your memory trends.</p>
+                    {% if srs_cards %}
+                        <p class="text-3xl font-bold text-blue-600 my-4">{{ srs_cards|length }} Card{{ srs_cards|length|pluralize }}</p>
+                        <a href="{% url 'flashcard_review_session' %}?title=Memory+Strength+Review&cards={% for card in srs_cards %}{{ card.id }},{% endfor %}" class="block w-full text-center bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"><i class="fas fa-brain mr-2"></i>Start Review</a>
+                    {% else %}
+                        <p class="text-center text-gray-500 mt-6 py-4">No cards due for review today. Great job!</p>
+                    {% endif %}
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold text-gray-800">Today's Topics Review</h3>
+                    <p class="text-gray-600 mt-1">Reinforce topics you were quizzed on today.</p>
+                    {% if todays_topic_cards %}
+                         <p class="text-3xl font-bold text-green-600 my-4">{{ todays_topic_cards|length }} Card{{ todays_topic_cards|length|pluralize }}</p>
+                        <a href="{% url 'flashcard_review_session' %}?title=Today's+Topics+Review&cards={% for card in todays_topic_cards %}{{ card.id }},{% endfor %}" class="block w-full text-center bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"><i class="fas fa-bolt mr-2"></i>Start Quick Review</a>
+                    {% else %}
+                        <p class="text-center text-gray-500 mt-6 py-4">No quizzes taken today. Complete a lesson to see cards here!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-10">
+             <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-700">My Flashcard Sets</h2>
+                <button onclick="document.getElementById('createSetModal').classList.remove('hidden')" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors"><i class="fas fa-plus mr-2"></i>Create New Set</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for set in user_sets %}
+                    <a href="{% url 'flashcard_set_view' set.id %}" class="card block hover:ring-2 hover:ring-indigo-500 transition">
+                        <h3 class="text-xl font-semibold text-gray-800 truncate">{{ set.title }}</h3>
+                        <p class="text-gray-600 text-sm mt-1">{{ set.flashcards.count }} Card{{ set.flashcards.count|pluralize }}</p>
+                    </a>
+                {% empty %}
+                    <p class="md:col-span-3 text-center text-gray-500 py-6">You haven't created any flashcard sets yet. Click the button to get started!</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Upcoming Reviews (Next 7 Days)</h2>
+            <div class="card">
+                {% if upcoming_cards %}
+                    <ul class="space-y-2">
+                    {% for card in upcoming_cards %}
+                        <li class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700 truncate pr-4">{{ card.flashcard.question|truncatechars:80 }}</span>
+                            <span class="text-sm font-semibold text-gray-600 whitespace-nowrap">Due: {{ card.next_review_date|date:"D, M j" }}</span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center text-gray-500 py-6">No flashcards scheduled for review in the next 7 days.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">AI Suggestions: Create Cards for These Topics</h2>
+            <div class="card">
+                <p class="text-gray-600 mb-4">Creating your own flashcards is a powerful way to learn. I recommend making a new set for one of these topics where your mastery is below 80%.</p>
+                <div class="flex flex-wrap gap-3">
+                     {% for topic in suggestion_topics %}
+                        <div class="flex items-center gap-2 bg-yellow-100 p-1.5 pr-3 rounded-full">
+                            <span class="text-yellow-800 text-sm font-medium px-1">{{ topic.lesson.title }}</span>
+                            <form method="POST" action="{% url 'flashcard_dashboard' %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="create_suggested_set">
+                                <input type="hidden" name="lesson_id" value="{{ topic.lesson.id }}">
+                                <button type="submit" class="text-xs bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold p-1.5 rounded-full leading-none" title="Auto-create a review set for this topic">
+                                    <i class="fas fa-magic"></i> Make For Me
+                                </button>
+                            </form>
+                        </div>
+                     {% empty %}
+                        <p class="text-gray-500">No specific weaknesses found. Fantastic work!</p>
+                     {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <div class="mt-12 text-center">
+             <a href="{% url 'dashboard' %}" class="text-blue-600 hover:text-blue-800 font-semibold"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div id="createSetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-8 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Create a New Flashcard Set</h2>
+            <form method="POST" action="{% url 'flashcard_dashboard' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="set_title" class="block text-gray-700 font-bold mb-2">Set Title</label>
+                    <input type="text" name="set_title" id="set_title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div class="mb-6">
+                    <label for="set_description" class="block text-gray-700 font-bold mb-2">Description (Optional)</label>
+                    <textarea name="set_description" id="set_description" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                </div>
+                <div class="flex items-center justify-end">
+                    <button type="button" onclick="document.getElementById('createSetModal').classList.add('hidden')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg mr-2">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Create Set</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

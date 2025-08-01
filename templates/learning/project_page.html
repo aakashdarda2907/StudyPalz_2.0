@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Custom Project</title>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    <main style="padding: 20px;">
+        <h1>Generate Your Custom Project</h1>
+        <p>Apply your skills to a real-world problem. Our AI will suggest a project based on your interests.</p>
+
+        <form action="{% url 'project_generation' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Generate My Project Idea</button>
+        </form>
+
+        <hr style="margin: 30px 0;">
+
+        {% if project_idea %}
+        <div id="project-display" style="background-color: #f5f5f5; padding: 20px;">
+            <h2>Your Personalized Project Brief</h2>
+            <h3>{{ project_idea.title }}</h3>
+            <p><strong>Description:</strong> {{ project_idea.description }}</p>
+            <p><strong>Suggested Dataset:</strong> {{ project_idea.dataset }}</p>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

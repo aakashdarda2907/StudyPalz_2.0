@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find a Study Pal</title>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    <main style="padding: 20px;">
+        <h1>Find a Study Pal</h1>
+
+        {% if weak_lesson %}
+            <p>Our AI noticed you're working on <strong>{{ weak_lesson.title }}</strong>. Connect with others to master it!</p>
+
+            <div style="margin-top: 30px;">
+                <h3>Get Help From Mentors</h3>
+                <p><small>These users have mastered this topic and might be able to help.</small></p>
+                {% for mentor in suggested_mentors %}
+                    <div style="border: 1px solid #1c7a1c; padding: 10px; margin-bottom: 10px; background-color: #f0fff0;">
+                        <h4>{{ mentor.username }}</h4>
+                        <p>Status: Mastered this topic!</p>
+                        <button>Send Message (Feature coming soon!)</button>
+                    </div>
+                {% empty %}
+                    <p>No mentors available for this topic right now.</p>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3>Study With Peers</h3>
+                <p><small>These users are also working on this topic.</small></p>
+                {% for pal in suggested_peers %}
+                    <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+                        <h4>{{ pal.username }}</h4>
+                        <p>Status: Also studying this topic.</p>
+                        <button>Send Message (Feature coming soon!)</button>
+                    </div>
+                {% empty %}
+                    <p>No other users seem to be stuck on this topic right now.</p>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <p>You're doing great! We don't have any specific recommendations for study partners right now. Keep up the great work!</p>
+        {% endif %}
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Setup Your Quiz - StudyPalz</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    {% include 'partials/navbar.html' %}
+    <main class="container mx-auto mt-8 px-4">
+        <div class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+            <h1 class="text-2xl font-bold mb-4">Setup Your Practice Test</h1>
+            <p class="mb-6 text-gray-600">Customize the quiz for your practice session on: <strong>{{ task.task_description }}</strong></p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label for="num_questions" class="block text-sm font-medium text-gray-700">Number of Questions:</label>
+                        <select name="num_questions" id="num_questions" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option>5</option>
+                            <option>10</option>
+                            <option>15</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="question_type" class="block text-sm font-medium text-gray-700">Question Type:</label>
+                        <select name="question_type" id="question_type" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <option value="multiple-choice">Multiple-Choice</option>
+                            <option value="true/false">True/False</option>
+                            <option value="short-answer">Short Answer</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="mt-6 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Generate My Quiz
+                </button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

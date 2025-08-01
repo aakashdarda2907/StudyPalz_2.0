@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Modules</title>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    <main style="padding: 20px;">
+        <h1>Course Modules</h1>
+
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li style="color:green;">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% for module in modules %}
+            <div style="margin-bottom: 30px; border: 1px solid #ddd; padding: 15px;">
+                <h2>{{ module.title }}</h2>
+                <p>{{ module.description }}</p>
+                <h4>Lessons in this module:</h4>
+                <ul>
+                    {% for lesson in module.lesson_set.all %}
+                        <li>
+                            <a href="{% url 'lesson_detail' lesson.id %}">{{ lesson.title }}</a>
+                            {% if lesson.id in completed_lessons %}
+                                <span style="color: green;">&#10004; Completed</span>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>No lessons in this module yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </main>
+</body>
+</html>

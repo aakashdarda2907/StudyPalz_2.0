@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Generated Quiz - StudyPalz</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    {% include 'partials/navbar.html' %}
+    <main class="container mx-auto mt-8 px-4">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold mb-4">Practice Test on: {{ lesson_titles|join:", " }}</h1>
+            
+            <form action="{% url 'submit_ai_quiz' %}" method="post">
+                {% csrf_token %}
+                <input type='hidden' name="quiz_data" value='{{ quiz_json_str }}'>
+                
+                <div class="space-y-6">
+                {% for question in quiz_data.questions %}
+                    <fieldset>
+                        <legend class="font-semibold">{{ forloop.counter }}. {{ question.question_text }}</legend>
+                        <div class="space-y-2 mt-2">
+                        {% for answer in question.answers %}
+                            <div>
+                                <input type="radio" name="question_{{ forloop.parentloop.counter0 }}" value="{{ forloop.counter0 }}" id="q{{ forloop.parentloop.counter0 }}a{{ forloop.counter0 }}" required>
+                                <label for="q{{ forloop.parentloop.counter0 }}a{{ forloop.counter0 }}" class="ml-2">{{ answer }}</label>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </fieldset>
+                {% endfor %}
+                </div>
+                <button type="submit" class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit Quiz</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

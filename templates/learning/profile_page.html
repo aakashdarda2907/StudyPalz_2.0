@@ -1,0 +1,443 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile - StudyPalz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-blue: #64748b;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            --green-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--light-blue);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .profile-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-large);
+        }
+
+        .profile-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+
+        .detail-item:hover {
+            background: var(--light-gray);
+            margin: 0 -1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--medium-blue);
+            font-size: 0.95rem;
+        }
+
+        .detail-value {
+            color: var(--dark-blue);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(135deg, var(--light-teal) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: var(--transition);
+        }
+
+        .badge-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+        }
+
+        .badge-item:hover::before {
+            left: 100%;
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .badge-name {
+            font-weight: 600;
+            color: var(--primary-teal-dark);
+            font-size: 0.9rem;
+        }
+
+        .ai-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .ai-card {
+            border-top: 4px solid transparent;
+            background: linear-gradient(135deg, var(--white) 0%, #fefefe 100%);
+        }
+
+        .ai-card.summary { border-top-color: var(--primary-teal); }
+        .ai-card.advice { border-top-color: #10b981; }
+        .ai-card.insight { border-top-color: #8b5cf6; }
+
+        .ai-card .card-icon.summary { background: var(--accent-gradient); }
+        .ai-card .card-icon.advice { background: var(--green-gradient); }
+        .ai-card .card-icon.insight { background: var(--purple-gradient); }
+
+        .ai-content {
+            color: var(--medium-blue);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .advice-list {
+            list-style: none;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .advice-item {
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border-radius: 12px;
+            border-left: 4px solid #10b981;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .advice-item::before {
+            content: '💡';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .advice-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--light-blue);
+            background: linear-gradient(135deg, var(--light-gray) 0%, #f1f5f9 100%);
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--border-light);
+            position: relative;
+        }
+
+        .empty-state::before {
+            content: '🏆';
+            font-size: 3rem;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-card {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .profile-card:nth-child(1) { animation-delay: 0.1s; }
+        .profile-card:nth-child(2) { animation-delay: 0.2s; }
+        .profile-card:nth-child(3) { animation-delay: 0.3s; }
+        .profile-card:nth-child(4) { animation-delay: 0.4s; }
+        .profile-card:nth-child(5) { animation-delay: 0.5s; }
+
+        @media (max-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 1.5rem 0; }
+            .profile-card { padding: 2rem; }
+            .badges-grid { grid-template-columns: 1fr; }
+            .page-header::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% include 'partials/navbar.html' %}
+    </header>
+
+    <main class="container main-content">
+        <div class="page-header">
+            <h1 class="page-title">{{ user.username }}'s Profile</h1>
+            <p class="page-subtitle">Your complete learning journey and AI-powered insights</p>
+        </div>
+
+        <div class="profile-grid">
+            <div>
+                <div class="profile-card">
+                    <h2 class="card-title">
+                        <span class="card-icon" style="background: var(--accent-gradient);">👤</span>
+                        My Details
+                    </h2>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">{{ user.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Learning Style</span>
+                        <span class="detail-value">{{ user_profile.get_learning_style_display }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Interests</span>
+                        <span class="detail-value">{{ user_profile.interests|default:"Not set" }}</span>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <h2 class="card-title">
+                        <span class="card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🏆</span>
+                        My Achievements
+                    </h2>
+                    {% if user_badges %}
+                        <div class="badges-grid">
+                            {% for badge in user_badges %}
+                                <div class="badge-item">
+                                    <div class="badge-icon">🏆</div>
+                                    <div class="badge-name">{{ badge.name }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <p>Keep learning to earn your first badge!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="ai-section">
+                <div class="profile-card ai-card summary">
+                    <h2 class="card-title">
+                        <span class="card-icon summary">🧠</span>
+                        AI Learning Coach Summary
+                    </h2>
+                    <p class="ai-content">{{ ai_summary.overall_summary }}</p>
+                </div>
+
+                <div class="profile-card ai-card advice">
+                    <h2 class="card-title">
+                        <span class="card-icon advice">🎯</span>
+                        Actionable Advice
+                    </h2>
+                    <ul class="advice-list">
+                        {% for advice in ai_summary.actionable_advice_list %}
+                            <li class="advice-item">{{ advice }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="profile-card ai-card insight">
+                    <h2 class="card-title">
+                        <span class="card-icon insight">🎨</span>
+                        Learning Style Insight
+                    </h2>
+                    <p class="ai-content">{{ ai_summary.learning_style_insight }}</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

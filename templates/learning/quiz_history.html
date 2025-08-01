@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Quiz History - StudyPalz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --primary-teal-light: #67e8f9;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --accent-gold: #f59e0b;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --danger-red: #ef4444;
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.25rem);
+            margin-bottom: 1.5rem;
+            color: var(--dark-blue);
+        }
+        
+        h3 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 0 2rem;
+            }
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            padding-top: 0rem;
+            padding-bottom: 4rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            background: linear-gradient(135deg, var(--light-teal), rgba(240, 253, 255, 0.3));
+            border-left: 5px solid var(--primary-teal);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--medium-blue);
+            font-size: 1.1rem;
+        }
+
+        .quiz-history-container {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @media (max-width: 640px) {
+            .quiz-history-container {
+                padding: 1.5rem;
+            }
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(59, 130, 246, 0.02));
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-teal);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--medium-blue);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .quiz-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .quiz-attempt {
+            background: var(--light-gray);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-attempt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .quiz-attempt:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .quiz-attempt:hover::before {
+            transform: scaleX(1);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .quiz-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .quiz-date {
+            color: var(--medium-blue);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .score-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .score-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .score-needs-improvement {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .score-details {
+            color: var(--medium-blue);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar {
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.8s ease-out;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .progress-excellent {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .progress-good {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .progress-needs-improvement {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .review-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--accent-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .review-link:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--medium-blue);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(59, 130, 246, 0.02));
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--border-light);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+
+        .empty-state p {
+            max-width: 400px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: var(--accent-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-large);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .quiz-attempt:nth-child(1) { animation-delay: 0.1s; }
+        .quiz-attempt:nth-child(2) { animation-delay: 0.2s; }
+        .quiz-attempt:nth-child(3) { animation-delay: 0.3s; }
+        .quiz-attempt:nth-child(4) { animation-delay: 0.4s; }
+        .quiz-attempt:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .quiz-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .score-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Focus states for accessibility */
+        .quiz-attempt:focus,
+        .review-link:focus,
+        .cta-button:focus {
+            outline: 2px solid var(--primary-teal);
+            outline-offset: 2px;
+        }
+
+        /* Print styles */
+        @media print {
+            .main-content {
+                padding-top: 0;
+            }
+            
+            .quiz-attempt {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+                margin-bottom: 1rem;
+            }
+            
+            .review-link, .cta-button {
+                background: #f5f5f5 !important;
+                color: #333 !important;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="container main-content pt-32">
+        <div class="page-header">
+            <h1>My Quiz History</h1>
+            <p>Track your progress and review your quiz attempts</p>
+        </div>
+
+        <div class="quiz-history-container">
+            {% if attempts_with_scores %}
+                <div class="quiz-grid">
+                    {% for item in attempts_with_scores %}
+                    {% with attempt=item.attempt overall_percent=item.overall_percent %}
+                    <div class="quiz-attempt">
+                        <div class="quiz-header">
+                            <div>
+                                <h3 class="quiz-title">{{ attempt.quiz.title }}</h3>
+                                <p class="quiz-date">Completed on {{ attempt.timestamp|date:"F d, Y" }} at {{ attempt.timestamp|time:"g:i A" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="score-container">
+                            <div class="score-badge {% if overall_percent >= 80 %}score-excellent{% elif overall_percent >= 50 %}score-good{% else %}score-needs-improvement{% endif %}">
+                                {{ overall_percent }}%
+                            </div>
+                            <div class="score-details">
+                                Overall Score
+                            </div>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if overall_percent >= 80 %}progress-excellent{% elif overall_percent >= 50 %}progress-good{% else %}progress-needs-improvement{% endif %}" 
+                                 style="width: {{ overall_percent }}%;">
+                            </div>
+                        </div>
+
+                        <a href="{% url 'quiz_review' attempt.id %}" class="review-link">
+                            Review Answers
+                        </a>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Ready to Start Your Quiz Journey?</h3>
+                    <p>You haven't taken any quizzes yet. Take your first quiz to start tracking your progress and see your results here!</p>
+                    <a href="{% url 'practice_center' %}" class="cta-button">
+                        Start Your First Quiz
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+    </body>
+</html>

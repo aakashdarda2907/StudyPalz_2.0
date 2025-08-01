@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ lesson.title }} - StudyPalz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --primary-teal-light: #67e8f9;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem clamp(1rem, 4vw, 2rem) 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .back-link:hover {
+            color: var(--primary-teal-dark);
+            transform: translateX(-4px);
+        }
+
+        .lesson-title {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            margin-bottom: 2rem;
+            color: var(--dark-blue);
+            font-weight: 800;
+        }
+
+        .video-section {
+            margin-bottom: 2rem;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 42%;
+            height: 0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .feedback-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--medium-blue);
+        }
+
+        .feedback-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .feedback-btn.positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .feedback-btn.negative {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .feedback-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tools-section {
+            margin-bottom: 2rem;
+        }
+
+        .tools-header {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tools-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.8rem;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .tool-btn > span {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .tool-btn:hover::before {
+            left: 100%;
+        }
+        
+        .tool-btn:hover .ai-pick-tag {
+            animation: shake 0.5s;
+        }
+
+        /* Styles for the AI Pick tag to match the user's image */
+        .tool-btn.recommended {
+            background: #23B0C7; /* A more specific cyan color from the image */
+            box-shadow: 0 6px 20px rgba(35, 176, 199, 0.4);
+            border: 2px solid rgba(35, 176, 199, 0.3);
+            animation: pulse-glow-teal 2s infinite;
+        }
+
+        .tool-btn.recommended .ai-pick-tag {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 60px;
+            height: 60px;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        .tool-btn.recommended .ai-pick-tag::before {
+            content: "AI";
+            position: absolute;
+            top: 10px;
+            right: -18px;
+            background: #FF9800; /* Yellow-orange color */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            padding: 5px 25px;
+            width: 100px;
+            text-align: center;
+            transform: rotate(45deg);
+        }
+        
+        .tool-btn.recommended .ai-pick-tag::after {
+            content: "⭐";
+            position: absolute;
+            top: 5px;
+            right: 18px;
+            font-size: 0.8rem;
+            transform: rotate(45deg);
+            z-index: 11;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        @keyframes pulse-glow-teal {
+            0%, 100% {
+                box-shadow: 0 6px 20px rgba(35, 176, 199, 0.4), 0 0 0 0 rgba(35, 176, 199, 0.3);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(35, 176, 199, 0.6), 0 0 0 4px rgba(35, 176, 199, 0.1);
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
+            20%, 40%, 60%, 80% { transform: rotate(5deg); }
+        }
+
+        .tool-btn.notes { background: var(--accent-gradient); color: var(--white); }
+        .tool-btn.analogy { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: var(--white); }
+        .tool-btn.example { background: #23B0C7; color: var(--white); }
+        .tool-btn.audio { background: linear-gradient(135deg, #f97316, #ea580c); color: var(--white); }
+
+        .tool-btn:hover:not(.recommended) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+
+        .ai-suggestion {
+            padding: 1rem;
+            background: var(--light-teal);
+            border-left: 4px solid var(--primary-teal);
+            border-radius: 0 12px 12px 0;
+            margin-top: 1rem;
+        }
+
+        .ai-suggestion-title {
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .content-container {
+            margin-top: 1.5rem;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .content-container.hidden {
+            display: none;
+        }
+
+        .content-box {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .content-box .prose {
+            max-width: none;
+        }
+
+        .content-box h1, .content-box h2, .content-box h3 {
+            color: var(--dark-blue);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-box h1:first-child, 
+        .content-box h2:first-child, 
+        .content-box h3:first-child {
+            margin-top: 0;
+        }
+
+        .content-box p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .content-box ul, .content-box ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .content-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content-box pre {
+            background: var(--dark-blue);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .content-box code {
+            background: var(--light-gray);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .content-box pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            color: var(--medium-blue);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-light);
+            border-top: 2px solid var(--primary-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chat-section {
+            border-top: 2px solid var(--border-light);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            background: var(--light-gray);
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.bot {
+            background: var(--light-teal);
+            color: var(--dark-blue);
+            align-self: flex-start;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .chat-message.user {
+            background: var(--medium-blue);
+            color: var(--white);
+            align-self: flex-end;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            font-family: inherit;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .chat-submit {
+            padding: 0.8rem 1.5rem;
+            background: var(--accent-gradient);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chat-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: var(--medium-blue);
+            margin-top: 0.5rem;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading { animation: pulse 1.5s infinite; }
+        
+        .tool-btn.audio.loading .icon {
+            animation: spin 1.5s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 5rem 1rem 2rem; }
+            .card { padding: 1.5rem; }
+            .tools-grid { flex-direction: column; }
+            .tool-btn { justify-content: center; padding: 1rem; }
+            .feedback-container { justify-content: center; }
+        }
+        
+        .completion-section {
+            border-top: 2px solid var(--border-light);
+            padding-top: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .completion-btn {
+            background: var(--accent-gradient);
+            color: var(--white);
+            font-size: 1.1rem;
+            padding: 1rem 2.5rem;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            display: inline-block;
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+        }
+        .completion-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="container">
+        <div class="card">
+            <a href="{% url 'plan_detail' lesson.module.study_plan.id %}" class="back-link">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+                Back to Plan
+            </a>
+            
+            <h1 class="lesson-title">{{ lesson.title }}</h1>
+
+            <div class="video-section">
+                <h2 class="tools-header">Video Tutorial</h2>
+                <div class="video-container">
+                    <iframe id="youtube-player" src="{{ video_url }}" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="feedback-container">
+                    <span class="feedback-text">Was this video helpful?</span>
+                    <button data-feedback="1" data-type="video" class="feedback-btn positive">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M7 10v12l4-4 4 4V11l4-4H7z"/></svg>
+                        Yes
+                    </button>
+                    <button data-feedback="-1" data-type="video" class="feedback-btn negative">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M7 14V2l4 4 4-4v11l4 4H7z"/></svg>
+                        No
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tools-section">
+                <h2 class="tools-header">Learning Tools</h2>
+                <div class="tools-grid">
+                    <button data-content-type="notes" class="tool-btn notes {% if recommendation_data.recommendation == 'notes' %}recommended{% endif %}">
+                        {% if recommendation_data.recommendation == 'notes' %}
+                        <span class="ai-pick-tag"></span>
+                        {% endif %}
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+                        <span>Revision Notes</span>
+                    </button>
+                    
+                    <button data-content-type="analogy" class="tool-btn analogy {% if recommendation_data.recommendation == 'analogy' %}recommended{% endif %}">
+                        {% if recommendation_data.recommendation == 'analogy' %}
+                        <span class="ai-pick-tag"></span>
+                        {% endif %}
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/></svg>
+                        <span>Show Analogy</span>
+                    </button>
+
+                    <button data-content-type="example" class="tool-btn example {% if recommendation_data.recommendation == 'example' %}recommended{% endif %}">
+                        {% if recommendation_data.recommendation == 'example' %}
+                        <span class="ai-pick-tag"></span>
+                        {% endif %}
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/></svg>
+                        <span>Show Example</span>
+                    </button>
+                    
+                    <button id="audio-toggle-btn" class="tool-btn audio">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        <span>Listen to Summary</span>
+                    </button>
+                </div>
+                
+                <div class="ai-suggestion">
+                    <div class="ai-suggestion-title">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        AI Suggestion
+                    </div>
+                    <p>{{ recommendation_data.reason }}</p>
+                </div>
+
+                <p id="audio-status" class="status-text"></p>
+
+                <div id="notes-content" class="content-container hidden"></div>
+                <div id="analogy-content" class="content-container hidden"></div>
+                <div id="example-content" class="content-container hidden"></div>
+ <div class="completion-section">
+    {% if is_completed %}
+        <h2 class="tools-header" style="color: #16a34a;">✅ Lesson Completed</h2>
+        <p style="max-width: 600px; margin: 0 auto 1.5rem; color: var(--medium-blue);">
+            You have already passed the completion quiz for this lesson. Great work!
+        </p>
+        <a href="{% url 'plan_detail' lesson.module.study_plan.id %}" class="completion-btn" style="background: #6b7280;">
+            Back to Study Plan
+        </a>
+    {% else %}
+        <h2 class="tools-header">Ready to test your knowledge?</h2>
+
+        {% if quiz_insight %}
+        <div class="ai-suggestion" style="max-width: 600px; margin: 0 auto 1.5rem; text-align: left;">
+            <div class="ai-suggestion-title">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                AI Insight
+            </div>
+            <p>{{ quiz_insight }}</p>
+        </div>
+        {% endif %}
+
+        {% if completion_quiz %}
+            <a href="{% url 'take_quiz' completion_quiz.id %}" class="completion-btn">
+                Start Completion Quiz
+            </a>
+        {% else %}
+            <p style="max-width: 600px; margin: 0 auto 1.5rem; color: var(--medium-blue);">
+                A completion quiz could not be generated for this lesson at this time.
+            </p>
+        {% endif %}
+    {% endif %}
+</div>
+            <div class="chat-section">
+                <h2 class="tools-header">Ask Your AI Tutor</h2>
+                <div id="chat-messages" class="chat-container">
+                    <div class="chat-message bot">Hello! Ask me any question about this lesson.</div>
+                </div>
+                <form id="chat-form" class="chat-form">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Type your question here..." required>
+                    <button type="submit" class="chat-submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lessonId = {{ lesson.id }};
+            const csrfToken = '{{ csrf_token }}';
+
+            function logInteraction(interactionType, feedback = null) {
+                fetch("{% url 'log_interaction' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ lesson_id: lessonId, interaction_type: interactionType, feedback: feedback })
+                });
+            }
+
+            // Video interaction tracking
+            const player = document.getElementById('youtube-player');
+            if (player) {
+                let videoInteractionLogged = false;
+                player.addEventListener('mouseenter', () => {
+                    if (!videoInteractionLogged) {
+                        logInteraction('viewed_video');
+                        videoInteractionLogged = true;
+                    }
+                });
+            }
+
+            // Content buttons
+            document.querySelectorAll('[data-content-type]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const contentType = this.dataset.contentType;
+                    const container = document.getElementById(`${contentType}-content`);
+                    const url = `/api/get-lesson-content/${lessonId}/${contentType}/`;
+                    
+                    // Hide other content containers
+                    document.querySelectorAll('.content-container').forEach(c => c.classList.add('hidden'));
+                    
+                    this.classList.add('loading');
+                    container.innerHTML = `
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <span>Generating ${contentType === 'notes' ? 'revision notes' : contentType}...</span>
+                        </div>
+                    `;
+                    container.classList.remove('hidden');
+                    logInteraction(`requested_${contentType}`);
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            container.innerHTML = `
+                                <div class="content-box">
+                                    <div class="prose">${data.html_content}</div>
+                                </div>
+                                <div class="feedback-container">
+                                    <span class="feedback-text">Was this helpful?</span>
+                                    <button data-feedback="1" data-type="${contentType}" class="feedback-btn positive">
+                                        <svg class="icon" viewBox="0 0 24 24"><path d="M7 10v12l4-4 4 4V11l4-4H7z"/></svg>
+                                        Yes
+                                    </button>
+                                    <button data-feedback="-1" data-type="${contentType}" class="feedback-btn negative">
+                                        <svg class="icon" viewBox="0 0 24 24"><path d="M7 14V2l4 4 4-4v11l4 4H7z"/></svg>
+                                        No
+                                    </button>
+                                </div>
+                            `;
+                            
+                            // Highlight code blocks
+                            container.querySelectorAll('pre code').forEach(block => {
+                                hljs.highlightElement(block);
+                            });
+                            
+                            this.classList.remove('loading');
+                            
+                            // Smooth scroll to content
+                            setTimeout(() => {
+                                container.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'start',
+                                    inline: 'nearest'
+                                });
+                            }, 100);
+                        })
+                        .catch(error => {
+                            container.innerHTML = `
+                                <div class="content-box">
+                                    <p style="color: var(--medium-blue);">Sorry, there was an error generating the content. Please try again.</p>
+                                </div>
+                            `;
+                            this.classList.remove('loading');
+                        });
+                });
+            });
+
+            // Feedback handling
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.feedback-btn')) {
+                    const btn = e.target.closest('.feedback-btn');
+                    const feedback = btn.dataset.feedback;
+                    const contentType = btn.dataset.type;
+                    logInteraction(`feedback_${contentType}`, feedback);
+                    btn.closest('.feedback-container').innerHTML = '<span class="status-text" style="color: var(--primary-teal);">Thanks for your feedback!</span>';
+                }
+            });
+
+            // Audio functionality
+            const audioToggleBtn = document.getElementById('audio-toggle-btn');
+            const audioStatusEl = document.getElementById('audio-status');
+            let voices = [];
+            let isPlaying = false;
+            
+            function loadVoices() { voices = window.speechSynthesis.getVoices(); }
+            loadVoices();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = loadVoices;
+            }
+
+            const stopSpeech = () => {
+                window.speechSynthesis.cancel();
+                isPlaying = false;
+                audioToggleBtn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <span>Listen to Summary</span>
+                `;
+                audioStatusEl.textContent = '';
+                audioToggleBtn.classList.remove('loading');
+            };
+
+            window.addEventListener('beforeunload', stopSpeech);
+
+            audioToggleBtn.addEventListener('click', function() {
+                if (isPlaying) {
+                    stopSpeech();
+                } else {
+                    // Start playing
+                    isPlaying = true;
+                    this.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        <span>Stop Audio</span>
+                    `;
+                    this.classList.add('loading');
+                    audioStatusEl.textContent = 'AI is writing a script...';
+                    logInteraction('requested_audio');
+
+                    fetch(`/api/get-lesson-content/${lessonId}/podcast_script/`)
+                        .then(r => r.json())
+                        .then(d => {
+                            const script = d.html_content.replace(/<[^>]*>?/gm, '');
+                            if ('speechSynthesis' in window) {
+                                const utterance = new SpeechSynthesisUtterance(script);
+                                let voice = voices.find(v => v.name.includes('Google') && v.lang.includes('en'));
+                                if (!voice) voice = voices.find(v => v.lang.includes('en'));
+                                if (voice) utterance.voice = voice;
+                                
+                                this.classList.remove('loading');
+                                utterance.onstart = () => {
+                                    audioStatusEl.textContent = 'Playing...';
+                                };
+                                utterance.onend = stopSpeech;
+                                window.speechSynthesis.speak(utterance);
+                            } else {
+                                stopSpeech();
+                                audioStatusEl.textContent = 'Speech synthesis not supported.';
+                            }
+                        })
+                        .catch(error => {
+                            stopSpeech();
+                            audioStatusEl.textContent = 'Error fetching audio script.';
+                        });
+                }
+            });
+
+            // Chat functionality
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const userMessage = chatInput.value.trim();
+                if (!userMessage) return;
+
+                const userDiv = document.createElement('div');
+                userDiv.className = 'chat-message user';
+                userDiv.textContent = userMessage;
+                chatMessages.appendChild(userDiv);
+
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'chat-message bot loading';
+                loadingDiv.textContent = 'Thinking...';
+                chatMessages.appendChild(loadingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                fetch("{% url 'ask_tutor' %}", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ lesson_id: lessonId, question_text: userMessage })
+                })
+                .then(r => r.json())
+                .then(d => {
+                    loadingDiv.innerHTML = d.response;
+                    loadingDiv.classList.remove('loading');
+                    loadingDiv.querySelectorAll('pre code').forEach(hljs.highlightElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+
+                chatInput.value = '';
+            });
+        });
+    </script>
+</body>
+</html>

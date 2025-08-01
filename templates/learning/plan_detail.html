@@ -1,0 +1,383 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plan.title }} - StudyPalz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --primary-teal-light: #67e8f9;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --border-light: #e2e8f0;
+            --text-gray: #64748b;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        .main-content {
+            padding: 2rem 0 4rem;
+            min-height: 100vh;
+            margin-top: 80px; /* Account for navbar height */
+        }
+
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+            opacity: 0;
+            animation: slideInLeft 0.6s ease-out 0.2s forwards;
+        }
+
+        .back-nav:hover {
+            color: var(--primary-teal-dark);
+            transform: translateX(-2px);
+        }
+
+        .back-icon {
+            width: 18px;
+            height: 18px;
+            transition: var(--transition);
+        }
+
+        .page-header {
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: slideUp 0.6s ease-out 0.1s forwards;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin: 0 0 0.5rem 0;
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        .modules-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .module-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: var(--transition);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        .module-card:nth-child(1) { animation-delay: 0.4s; }
+        .module-card:nth-child(2) { animation-delay: 0.5s; }
+        .module-card:nth-child(3) { animation-delay: 0.6s; }
+        .module-card:nth-child(4) { animation-delay: 0.7s; }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-header {
+            padding: 2rem 2rem 1rem;
+            background: linear-gradient(135deg, var(--light-teal), rgba(240, 253, 255, 0.3));
+            border-bottom: 1px solid var(--border-light);
+            position: relative;
+        }
+
+        .module-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .module-title {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-count {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .lessons-list {
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+
+        .lesson-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .lesson-item:hover {
+            padding-left: 0.5rem;
+            background: linear-gradient(90deg, transparent, var(--light-teal));
+            margin: 0 -0.5rem;
+            border-radius: 8px;
+        }
+
+        .lesson-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .lesson-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-teal);
+            flex-shrink: 0;
+        }
+
+        .lesson-link {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .lesson-link:hover {
+            color: var(--primary-teal);
+        }
+
+        .lesson-schedule {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .calendar-icon {
+            width: 14px;
+            height: 14px;
+            color: var(--primary-teal);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--medium-blue);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-blue);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content { 
+                padding: 1rem 0 2rem; 
+                margin-top: 70px; /* Smaller navbar on mobile */
+            }
+            .module-header, .lessons-list { padding: 1.5rem; }
+            .lesson-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .lesson-schedule { margin-left: 0; }
+            .page-title { font-size: 1.8rem; margin: 0 0 0.5rem 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0s !important;
+                transition-duration: 0s !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+
+    <main class="container main-content">
+         <h1 class="page-title">{{ plan.title }}</h1>
+        <a href="{% url 'my_plans' %}" class="back-nav">
+            <svg class="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to My Plans
+            
+        </a>
+        
+
+        <div class="modules-grid">
+            {% for module in plan.module_set.all %}
+                <div class="module-card">
+                    <div class="module-header">
+                        <h2 class="module-title">{{ module.title }}</h2>
+                        <div class="lesson-count">{{ module.lesson_set.count }} lesson{{ module.lesson_set.count|pluralize }}</div>
+                    </div>
+                    
+                    <div class="lessons-list">
+                        {% for lesson in module.lesson_set.all %}
+                            {% with task=lesson.scheduledtask_set.first %}
+                                <div class="lesson-item">
+                                    <div class="lesson-content">
+                                        <svg class="lesson-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                        <a href="{% url 'lesson_detail' lesson.id %}" class="lesson-link">
+                                            {{ lesson.title }}
+                                        </a>
+                                    </div>
+                                    {% if task %}
+                                        <div class="lesson-schedule">
+                                            <svg class="calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            {{ task.scheduled_day.date|date:"M d" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endwith %}
+                        {% empty %}
+                            <div class="empty-state">
+                                <h3>No lessons yet</h3>
+                                <p>This module doesn't have any lessons scheduled.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="module-card">
+                    <div class="empty-state">
+                        <h3>No modules found</h3>
+                        <p>This study plan doesn't have any modules yet.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        // Smooth hover transitions for lesson items
+        document.querySelectorAll('.lesson-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(4px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Add loading state to lesson links
+        document.querySelectorAll('.lesson-link').forEach(link => {
+            link.addEventListener('click', function() {
+                this.style.opacity = '0.7';
+                this.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    this.style.opacity = '';
+                    this.style.pointerEvents = '';
+                }, 2000);
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.module-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+    </script>
+</body>
+</html>

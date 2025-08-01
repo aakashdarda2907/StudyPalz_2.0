@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revision Card Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-blue: #64748b;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+                        linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .card { 
+            background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: 2rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 40px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-primary::before {
+            background: var(--accent-gradient);
+            opacity: 1;
+        }
+
+        .card-success::before {
+            background: var(--success-gradient);
+            opacity: 1;
+        }
+
+        .card-warning::before {
+            background: var(--warning-gradient);
+            opacity: 1;
+        }
+
+        .prose { 
+            color: var(--medium-blue);
+            line-height: 1.75;
+        }
+
+        .prose h3 { 
+            font-size: 1.25em;
+            margin-bottom: 1em;
+            margin-top: 1.5em;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .prose p { 
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+
+        .prose ul { 
+            margin-top: 1em;
+            margin-bottom: 1em;
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .prose ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .prose ul li::before {
+            content: '▸';
+            color: var(--primary-teal);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .prose strong { 
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.25);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.35);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+        }
+
+        .library-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .library-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, transparent 100%);
+            border-radius: 0 12px 0 12px;
+            transition: var(--transition);
+        }
+
+        .library-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-color: rgba(6, 182, 212, 0.2);
+        }
+
+        .library-card:hover::before {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+        }
+
+        .suggestion-item {
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .suggestion-item::before {
+            content: '💡';
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .suggestion-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-soft);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .stats-badge {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+            display: inline-block;
+        }
+
+        .upcoming-item {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: var(--transition);
+        }
+
+        .upcoming-item:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-soft);
+            border-color: rgba(6, 182, 212, 0.25);
+        }
+
+        .section-header {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .hero-stats {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .floating-decoration {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .floating-decoration:nth-child(1) {
+            top: 10%;
+            right: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-decoration:nth-child(2) {
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 7s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            50% { transform: translate(-10px, -10px) scale(1.1); opacity: 0.5; }
+        }
+
+        .page-title {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-accent {
+            color: var(--primary-teal);
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .card { padding: 1.5rem; }
+            .library-card, .suggestion-item, .upcoming-item { padding: 1rem; }
+        }
+    </style>
+</head>
+<body class="relative">
+    {% include 'partials/navbar.html' %}
+    
+    <div class="floating-decoration"></div>
+    <div class="floating-decoration"></div>
+    
+    {% comment %} --- THIS IS THE FIX --- {% endcomment %}
+    {% load learning_extras %}
+
+    <div class="container mx-auto p-4 md:p-8 relative z-10">
+        <header class="mb-10 text-center">
+            <h1 class="page-title">Revision Card Center</h1>
+            <p class="text-lg text-gray-600 mt-2">Strengthen your memory with quick, AI-powered revision summaries.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <div class="lg:col-span-2">
+                <div class="section-header">
+                    <h2 class="text-2xl font-bold text-gray-700">Today's Review Deck</h2>
+                </div>
+                <div class="card card-primary">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+                                <i class="fas fa-brain icon-accent"></i>
+                                Memory Strength Review
+                            </h3>
+                            <p class="text-gray-600 mt-1">Cards due based on your memory trends.</p>
+                        </div>
+                        {% if due_cards %}
+                        <div class="text-right">
+                            <p class="hero-stats">{{ due_cards|length }}</p>
+                            <div class="stats-badge">Card{{ due_cards|length|pluralize }} Due</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if due_cards %}
+                    <a href="{% url 'revision_card_review_session' %}?title=Daily+Review&cards={% for card in due_cards %}{{ card.id }},{% endfor %}" class="btn-primary block w-full text-center font-bold py-4 px-6 text-lg">
+                        <i class="fas fa-play mr-2"></i>Start Today's Review
+                    </a>
+                    {% else %}
+                    <div class="text-center py-8 border-t border-gray-100">
+                        <i class="fas fa-check-circle text-4xl text-green-500 mb-3"></i>
+                        <p class="text-gray-500 text-lg">You have no revision cards due today. Great job!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="lg:col-span-1">
+                <div class="section-header">
+                    <h2 class="text-2xl font-bold text-gray-700">AI Suggestions</h2>
+                </div>
+                <div class="card card-warning">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-lightbulb icon-accent mr-2"></i>
+                        <p class="text-gray-600">Generate cards for topics where your mastery is below 80%.</p>
+                    </div>
+                    <div class="space-y-3">
+                        {% for topic in suggestion_topics %}
+                        <div class="suggestion-item">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-amber-800 text-sm font-medium flex-1">{{ topic.lesson.title }}</span>
+                                <form method="POST" action="{% url 'revision_card_dashboard' %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="lesson_id" value="{{ topic.lesson.id }}">
+                                    <button type="submit" class="btn-warning text-xs font-bold py-2 px-3 rounded-lg transition" title="Auto-create a revision card for this topic">
+                                        <i class="fas fa-magic mr-1"></i> Create
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-6">
+                            <i class="fas fa-trophy text-3xl text-green-500 mb-2"></i>
+                            <p class="text-gray-500 text-sm">No specific weaknesses found. Fantastic work!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="mb-12">
+            <div class="section-header">
+                <h2 class="text-2xl font-bold text-gray-700">My Revision Card Library</h2>
+            </div>
+            <div class="card">
+                {% if all_revision_cards %}
+                    <div class="space-y-3">
+                    {% for card in all_revision_cards %}
+                        <a href="{% url 'revision_card_review_session' %}?title=Review: {{ card.lesson.title|urlencode }}&cards={{ card.id }}" class="library-card block">
+                            <div class="flex justify-between items-center">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-800 flex items-center">
+                                        <i class="fas fa-bookmark text-blue-500 mr-2"></i>
+                                        {{ card.lesson.title }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Next Review: {{ card.next_review_date|date:"M j" }}
+                                    </p>
+                                </div>
+                                <span class="text-sm text-blue-600 font-semibold flex items-center">
+                                    Review Now <i class="fas fa-arrow-right ml-1"></i>
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500 text-lg">Your library is empty.</p>
+                        <p class="text-gray-400 text-sm mt-1">Generate a card from the AI suggestions to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <div class="section-header">
+                <h2 class="text-2xl font-bold text-gray-700">Upcoming Reviews (Next 7 Days)</h2>
+            </div>
+            <div class="card">
+                {% if upcoming_cards %}
+                <div class="space-y-3">
+                    {% for card in upcoming_cards %}
+                    <div class="upcoming-item">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-semibold text-gray-800 flex items-center">
+                                    <i class="fas fa-clock text-blue-500 mr-2"></i>
+                                    {{ card.lesson.title }}
+                                </p>
+                                <p class="text-xs text-gray-500">{{ card.lesson.module.title }}</p>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-600 whitespace-nowrap stats-badge">
+                                {{ card.next_review_date|date:"D, M j" }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-check text-3xl text-green-500 mb-3"></i>
+                        <p class="text-gray-500">No cards are scheduled for review in the next 7 days.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="text-center">
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

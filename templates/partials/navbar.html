@@ -1,0 +1,1225 @@
+{% load static %}
+<style>
+    :root {
+        --primary-teal: #06b6d4;
+        --primary-teal-dark: #0891b2;
+        --primary-teal-light: #67e8f9;
+        --light-teal: #f0fdff;
+        --dark-blue: #0f172a;
+        --medium-blue: #334155;
+        --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        --white: #ffffff;
+        --light-gray: #f8fafc;
+        --border-light: #e2e8f0;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    /* ---------------- Floating Navbar Styling ---------------- */
+    .header {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        padding: 1rem 0;
+        position: fixed;
+        top: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 6rem);
+        max-width: 1400px;
+        z-index: 1000;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 
+                    0 4px 16px rgba(0, 0, 0, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        transition: var(--transition);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .header:hover {
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 
+                    0 6px 20px rgba(0, 0, 0, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transform: translateX(-50%) translateY(-2px);
+    }
+
+    .header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* Logo Styling */
+    .logo {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+        transition: var(--transition);
+        white-space: nowrap;
+        flex-shrink: 0;
+        letter-spacing: -0.02em;
+    }
+
+    .logo:hover {
+        transform: scale(1.05);
+    }
+
+    /* Navigation Container */
+    .nav-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+        flex: 1;
+        justify-content: center;
+        margin: 0 2rem;
+    }
+
+    /* Navigation Links Container */
+    .nav-links-container {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    /* Navigation Item (can be link or dropdown) */
+    .nav-item {
+        position: relative;
+    }
+
+    /* Base Navigation Link Styling */
+    .nav-link {
+        color: var(--medium-blue);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        position: relative;
+        padding: 0.7rem 1.2rem;
+        border-radius: 14px;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: -0.01em;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-teal);
+        background: rgba(6, 182, 212, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+        color: var(--primary-teal);
+        background: rgba(6, 182, 212, 0.12);
+        font-weight: 600;
+    }
+
+    /* Dropdown Arrow */
+    .nav-link.has-dropdown::after {
+        content: '▾';
+        margin-left: 0.4rem;
+        font-size: 0.7rem;
+        transition: var(--transition);
+        opacity: 0.6;
+        font-weight: 400;
+    }
+
+    .nav-item:hover .nav-link.has-dropdown::after,
+    .nav-item.dropdown-open .nav-link.has-dropdown::after {
+        transform: rotate(180deg);
+        opacity: 1;
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.8rem);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(25px);
+        border-radius: 18px;
+        padding: 1.2rem 0;
+        min-width: 240px;
+        max-width: 280px;
+        box-shadow: var(--shadow-large);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+    }
+
+    .nav-item:hover .dropdown-menu,
+    .nav-item.dropdown-open .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* Dropdown Category */
+    .dropdown-category {
+        padding: 0.6rem 1.4rem 0.4rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--primary-teal-dark);
+        background: linear-gradient(135deg, var(--light-teal), rgba(240, 253, 255, 0.4));
+        margin: 0 1rem 0.8rem;
+        border-radius: 10px;
+        border-left: 4px solid var(--primary-teal);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Dropdown Item */
+    .dropdown-item {
+        display: block;
+        padding: 0.8rem 1.4rem;
+        color: var(--dark-blue);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
+        margin: 0 1rem;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.4;
+    }
+
+    .dropdown-item:hover {
+        background: linear-gradient(135deg, var(--light-teal), rgba(240, 253, 255, 0.6));
+        color: var(--primary-teal-dark);
+        border-left-color: var(--primary-teal);
+        transform: translateX(4px);
+    }
+
+    .dropdown-item.active {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.08));
+        color: var(--primary-teal-dark);
+        border-left-color: var(--primary-teal);
+        font-weight: 600;
+    }
+
+    /* Add subtle icons using CSS */
+    .dropdown-item::before {
+        content: '•';
+        display: inline-block;
+        width: 8px;
+        color: var(--primary-teal-light);
+        margin-right: 0.8rem;
+        transition: var(--transition);
+        opacity: 0.6;
+        font-weight: bold;
+    }
+
+    .dropdown-item:hover::before,
+    .dropdown-item.active::before {
+        color: var(--primary-teal);
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    /* Dropdown separator */
+    .dropdown-separator {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+        margin: 0.8rem 1rem;
+    }
+
+    /* Auth Buttons */
+    .auth-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem 1.6rem;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+    }
+
+    .btn-primary {
+        background: var(--accent-gradient);
+        color: var(--white);
+        box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+    }
+    
+    .btn-secondary {
+        background: rgba(6, 182, 212, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(6, 182, 212, 0.25);
+        color: var(--primary-teal);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(6, 182, 212, 0.15);
+        border-color: rgba(6, 182, 212, 0.4);
+        transform: translateY(-1px);
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+        display: none;
+        background: rgba(6, 182, 212, 0.08);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        font-size: 1.2rem;
+        color: var(--primary-teal);
+        cursor: pointer;
+        padding: 0.8rem 1rem;
+        border-radius: 14px;
+        transition: var(--transition);
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        width: 48px;
+        height: 48px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-menu-toggle:hover {
+        background: rgba(6, 182, 212, 0.15);
+        border-color: rgba(6, 182, 212, 0.35);
+        transform: translateY(-1px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .nav-links-container {
+            gap: 1.5rem;
+        }
+        
+        .nav-link {
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .header {
+            top: 0.5rem;
+            width: calc(100% - 2rem);
+            padding: 0.8rem 0;
+        }
+
+        .header .container {
+            padding: 0 1.5rem;
+        }
+
+        .nav-links-container {
+            display: none;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+        }
+
+        .auth-buttons {
+            display: none; /* Hide auth buttons on mobile - they'll be in the mobile menu */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            width: calc(100% - 1rem);
+            top: 0.25rem;
+        }
+
+        .header .container {
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+        }
+    }
+
+    /* Mobile Navigation Bottom Sheet */
+    .mobile-nav-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1998;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-nav-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mobile-nav-sheet {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(30px);
+        border-radius: 24px 24px 0 0;
+        padding: 0;
+        box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transform: translateY(100%);
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        z-index: 1999;
+        max-height: 85vh;
+        overflow: hidden;
+    }
+
+    .mobile-nav-sheet.active {
+        transform: translateY(0);
+    }
+
+    /* Sheet Handle */
+    .sheet-handle {
+        width: 50px;
+        height: 4px;
+        background: rgba(6, 182, 212, 0.3);
+        border-radius: 2px;
+        margin: 1rem auto 0;
+        transition: background 0.3s ease;
+    }
+
+    .sheet-handle:hover {
+        background: rgba(6, 182, 212, 0.5);
+    }
+
+    /* Sheet Content */
+    .sheet-content {
+        padding: 1.5rem 2rem 2rem;
+        overflow-y: auto;
+        max-height: calc(85vh - 4rem);
+    }
+
+    .sheet-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-blue);
+        text-align: center;
+        margin-bottom: 2rem;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Mobile Navigation Grid */
+    .mobile-nav-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Mobile Navigation Cards */
+    .mobile-nav-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(6, 182, 212, 0.1);
+        border-radius: 20px;
+        padding: 1.5rem;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mobile-nav-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--accent-gradient);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .mobile-nav-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(6, 182, 212, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(6, 182, 212, 0.1);
+    }
+
+    .mobile-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--dark-blue);
+        margin-bottom: 1rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .mobile-card-icon {
+        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(6, 182, 212, 0.1);
+        border-radius: 10px;
+    }
+
+    .mobile-nav-links {
+        display: grid;
+        gap: 0.8rem;
+    }
+
+    .mobile-nav-links .nav-link {
+        padding: 1rem 1.2rem;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-decoration: none;
+        color: var(--medium-blue);
+        background: rgba(6, 182, 212, 0.04);
+        border: 1px solid rgba(6, 182, 212, 0.08);
+        transition: var(--transition);
+        font-weight: 500;
+        font-family: 'Inter', sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mobile-nav-links .nav-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05));
+        transition: width 0.3s ease;
+    }
+
+    .mobile-nav-links .nav-link:hover::before,
+    .mobile-nav-links .nav-link.active::before {
+        width: 100%;
+    }
+
+    .mobile-nav-links .nav-link:hover,
+    .mobile-nav-links .nav-link.active {
+        background: rgba(6, 182, 212, 0.08);
+        border-color: rgba(6, 182, 212, 0.2);
+        color: var(--primary-teal-dark);
+        transform: translateX(4px);
+        font-weight: 600;
+    }
+
+    .mobile-nav-links .nav-link .link-arrow {
+        font-size: 0.9rem;
+        opacity: 0;
+        transform: translateX(-8px);
+        transition: all 0.3s ease;
+        color: var(--primary-teal);
+        position: relative;
+        z-index: 1;
+    }
+
+    .mobile-nav-links .nav-link:hover .link-arrow,
+    .mobile-nav-links .nav-link.active .link-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Account Section */
+    .mobile-account-section {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(59, 130, 246, 0.05));
+        border: 1px solid rgba(6, 182, 212, 0.15);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mobile-account-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--accent-gradient);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .account-title {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--dark-blue);
+        margin-bottom: 1rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .account-icon {
+        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(6, 182, 212, 0.15);
+        border-radius: 10px;
+    }
+
+    .mobile-account-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .mobile-account-buttons .btn {
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        border-radius: 14px;
+        transition: var(--transition);
+        text-decoration: none;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .mobile-account-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Scrollbar styling */
+    .sheet-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sheet-content::-webkit-scrollbar-track {
+        background: rgba(6, 182, 212, 0.05);
+        border-radius: 3px;
+    }
+
+    .sheet-content::-webkit-scrollbar-thumb {
+        background: rgba(6, 182, 212, 0.3);
+        border-radius: 3px;
+    }
+
+    .sheet-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(6, 182, 212, 0.5);
+    }
+
+    /* Focus states for accessibility */
+    .btn:focus,
+    .nav-link:focus,
+    .dropdown-item:focus,
+    .mobile-menu-toggle:focus {
+        outline: 2px solid var(--primary-teal);
+        outline-offset: 2px;
+        border-radius: 14px;
+    }
+
+    /* Enhanced hover effects for desktop */
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--primary-teal);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+        border-radius: 1px;
+    }
+
+    .nav-link:hover::before,
+    .nav-link.active::before {
+        width: 60%;
+    }
+
+    /* Performance optimizations */
+    .header {
+        will-change: transform;
+    }
+
+    .nav-link,
+    .btn,
+    .dropdown-menu,
+    .mobile-nav-sheet {
+        will-change: transform;
+    }
+
+    /* Loading animation */
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive adjustments for smaller phones */
+    @media (max-width: 480px) {
+        .sheet-content {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        .mobile-nav-card {
+            padding: 1.2rem;
+        }
+
+        .mobile-account-buttons {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+
+        .mobile-account-buttons .btn {
+            padding: 0.9rem 1.2rem;
+        }
+
+        .sheet-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+
+<nav class="header" id="navbar">
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="logo">StudyPalz</a>
+        <div class="nav-wrapper">
+    <div class="nav-links-container" id="navLinksContainer">
+        <div class="nav-item">
+            <a href="#" class="nav-link has-dropdown">Study & Planning</a>
+            <div class="dropdown-menu">
+                <div class="dropdown-category">Dashboard & Overview</div>
+                <a href="{% url 'dashboard' %}" class="dropdown-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+                
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-category">Study Plans</div>
+                <a href="{% url 'my_plans' %}" class="dropdown-item {% if request.resolver_match.url_name == 'my_plans' %}active{% endif %}">My Plans</a>
+                <a href="{% url 'generate_plan' %}" class="dropdown-item {% if request.resolver_match.url_name == 'generate_plan' %}active{% endif %}">Generate Plan</a>
+                
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="#" class="nav-link has-dropdown">Practice & Tests</a>
+            <div class="dropdown-menu">
+                <div class="dropdown-category">Practice Centers</div>
+                <a href="{% url 'practice_center' %}" class="dropdown-item {% if request.resolver_match.url_name == 'practice_center' %}active{% endif %}">Practice Center</a>
+                <a href="{% url 'mock_exam_center' %}" class="dropdown-item {% if request.resolver_match.url_name == 'mock_exam_center' %}active{% endif %}">Mock Exam Center</a>
+                <a href="{% url 'power_pack_list' %}" class="dropdown-item {% if request.resolver_match.url_name == 'power_pack_list' %}active{% endif %}">Pre-Exam Power Pack</a>
+                
+                <a href="{% url 'revision_card_dashboard' %}" class="dropdown-item {% if 'revision_card' in request.resolver_match.url_name %}active{% endif %}">Revision Cards</a>
+                
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-category">Quiz & Analysis</div>
+                <a href="{% url 'quiz_history' %}" class="dropdown-item {% if request.resolver_match.url_name == 'quiz_history' %}active{% endif %}">Quiz History</a>
+                <a href="{% url 'knowledge_gap_finder' %}" class="dropdown-item {% if request.resolver_match.url_name == 'knowledge_gap_finder' %}active{% endif %}">Knowledge Gaps</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="#" class="nav-link has-dropdown">Progress & Schedule</a>
+            <div class="dropdown-menu">
+                <div class="dropdown-category">Progress Tracking</div>
+                <a href="{% url 'my_progress' %}" class="dropdown-item {% if request.resolver_match.url_name == 'my_progress' %}active{% endif %}">My Progress</a>
+                
+                <div class="dropdown-separator"></div>
+                <div class="dropdown-category">Scheduling</div>
+                <a href="{% url 'scheduler' %}" class="dropdown-item {% if request.resolver_match.url_name == 'scheduler' %}active{% endif %}">My Scheduler</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-buttons">
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-secondary">Log Out</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-secondary">Log In</a>
+        {% endif %}
+        <a href="{% url 'profile' %}" class="btn btn-primary">Profile</a>
+    </div>
+</div>
+
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                ☰
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Navigation Bottom Sheet -->
+<div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
+
+<div class="mobile-nav-sheet" id="mobileNavSheet">
+    <div class="sheet-handle" id="sheetHandle"></div>
+    
+    <div class="sheet-content">
+        <h2 class="sheet-title">Navigation</h2>
+        
+        <div class="mobile-nav-grid">
+            <!-- Study & Planning Card -->
+            <div class="mobile-nav-card">
+                <div class="mobile-card-title">
+                    <div class="mobile-card-icon">📚</div>
+                    Study & Planning
+                </div>
+                <div class="mobile-nav-links">
+                    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <span>Dashboard</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'my_plans' %}" class="nav-link {% if request.resolver_match.url_name == 'my_plans' %}active{% endif %}">
+                        <span>My Plans</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'generate_plan' %}" class="nav-link {% if request.resolver_match.url_name == 'generate_plan' %}active{% endif %}">
+                        <span>Generate Plan</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    
+                </div>
+            </div>
+
+            <!-- Practice & Tests Card -->
+            <div class="mobile-nav-card">
+                <div class="mobile-card-title">
+                    <div class="mobile-card-icon">🎯</div>
+                    Practice & Tests
+                </div>
+                <div class="mobile-nav-links">
+                    <a href="{% url 'practice_center' %}" class="nav-link {% if request.resolver_match.url_name == 'practice_center' %}active{% endif %}">
+                        <span>Practice Center</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'mock_exam_center' %}" class="nav-link {% if request.resolver_match.url_name == 'mock_exam_center' %}active{% endif %}">
+                        <span>Mock Exam Center</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'quiz_history' %}" class="nav-link {% if request.resolver_match.url_name == 'quiz_history' %}active{% endif %}">
+                        <span>Quiz History</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'knowledge_gap_finder' %}" class="nav-link {% if request.resolver_match.url_name == 'knowledge_gap_finder' %}active{% endif %}">
+                        <span>Knowledge Gaps</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Progress & Schedule Card -->
+            <div class="mobile-nav-card">
+                <div class="mobile-card-title">
+                    <div class="mobile-card-icon">📈</div>
+                    Progress & Schedule
+                </div>
+                <div class="mobile-nav-links">
+                    <a href="{% url 'my_progress' %}" class="nav-link {% if request.resolver_match.url_name == 'my_progress' %}active{% endif %}">
+                        <span>My Progress</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a href="{% url 'scheduler' %}" class="nav-link {% if request.resolver_match.url_name == 'scheduler' %}active{% endif %}">
+                        <span>My Scheduler</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Section -->
+        <div class="mobile-account-section">
+            <div class="account-title">
+                <div class="account-icon">👤</div>
+                Account & Settings
+            </div>
+            <div class="mobile-account-buttons">
+                <a href="{% url 'profile' %}" class="btn btn-primary">
+                    Profile
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">
+                        Log Out
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-secondary">
+                        Log In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mobile navigation toggle with bottom sheet functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileNavSheet = document.getElementById('mobileNavSheet');
+    const mobileNavBackdrop = document.getElementById('mobileNavBackdrop');
+    const sheetHandle = document.getElementById('sheetHandle');
+    let isNavOpen = false;
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    function openMobileNav() {
+        isNavOpen = true;
+        mobileNavSheet.classList.add('active');
+        mobileNavBackdrop.classList.add('active');
+        mobileMenuToggle.innerHTML = '✕';
+        mobileMenuToggle.setAttribute('aria-expanded', true);
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileNav() {
+        if (isNavOpen) {
+            isNavOpen = false;
+            mobileNavSheet.classList.remove('active');
+            mobileNavBackdrop.classList.remove('active');
+            mobileMenuToggle.innerHTML = '☰';
+            mobileMenuToggle.setAttribute('aria-expanded', false);
+            document.body.style.overflow = '';
+        }
+    }
+
+    function toggleMobileNav() {
+        if (isNavOpen) {
+            closeMobileNav();
+        } else {
+            openMobileNav();
+        }
+    }
+
+    // Event listeners
+    mobileMenuToggle.addEventListener('click', toggleMobileNav);
+    mobileNavBackdrop.addEventListener('click', closeMobileNav);
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isNavOpen) {
+            closeMobileNav();
+        }
+    });
+
+    // Close when clicking nav links
+    document.querySelectorAll('.mobile-nav-links .nav-link, .mobile-account-buttons .btn').forEach(link => {
+        link.addEventListener('click', () => {
+            setTimeout(closeMobileNav, 150);
+        });
+    });
+
+    // Touch/drag functionality for the sheet
+    function handleTouchStart(e) {
+        if (!isNavOpen) return;
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        mobileNavSheet.style.transition = 'none';
+    }
+
+    function handleTouchMove(e) {
+        if (!isDragging || !isNavOpen) return;
+        
+        currentY = e.touches[0].clientY;
+        const deltaY = currentY - startY;
+        
+        // Only allow dragging down
+        if (deltaY > 0) {
+            const translateY = Math.min(deltaY, window.innerHeight * 0.5);
+            mobileNavSheet.style.transform = `translateY(${translateY}px)`;
+            
+            // Adjust backdrop opacity based on drag distance
+            const opacity = Math.max(0.5 - (deltaY / (window.innerHeight * 0.5)) * 0.5, 0);
+            mobileNavBackdrop.style.opacity = opacity;
+        }
+    }
+
+    function handleTouchEnd(e) {
+        if (!isDragging || !isNavOpen) return;
+        
+        isDragging = false;
+        mobileNavSheet.style.transition = '';
+        mobileNavBackdrop.style.opacity = '';
+        
+        const deltaY = currentY - startY;
+        
+        // Close if dragged down more than 100px or with sufficient velocity
+        if (deltaY > 100) {
+            closeMobileNav();
+        } else {
+            // Snap back to original position
+            mobileNavSheet.style.transform = '';
+        }
+    }
+
+    // Add touch event listeners
+    sheetHandle.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    // Also add mouse events for desktop testing
+    sheetHandle.addEventListener('mousedown', (e) => {
+        if (!isNavOpen) return;
+        startY = e.clientY;
+        isDragging = true;
+        mobileNavSheet.style.transition = 'none';
+        
+        const handleMouseMove = (e) => {
+            if (!isDragging || !isNavOpen) return;
+            
+            currentY = e.clientY;
+            const deltaY = currentY - startY;
+            
+            if (deltaY > 0) {
+                const translateY = Math.min(deltaY, window.innerHeight * 0.5);
+                mobileNavSheet.style.transform = `translateY(${translateY}px)`;
+                
+                const opacity = Math.max(0.5 - (deltaY / (window.innerHeight * 0.5)) * 0.5, 0);
+                mobileNavBackdrop.style.opacity = opacity;
+            }
+        };
+        
+        const handleMouseUp = () => {
+            if (!isDragging || !isNavOpen) return;
+            
+            isDragging = false;
+            mobileNavSheet.style.transition = '';
+            mobileNavBackdrop.style.opacity = '';
+            
+            const deltaY = currentY - startY;
+            
+            if (deltaY > 100) {
+                closeMobileNav();
+            } else {
+                mobileNavSheet.style.transform = '';
+            }
+            
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+        
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    });
+
+    // Desktop dropdown functionality
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    navItems.forEach(item => {
+        const link = item.querySelector('.nav-link.has-dropdown');
+        const dropdown = item.querySelector('.dropdown-menu');
+        
+        if (link && dropdown) {
+            let hoverTimeout;
+            
+            item.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                item.classList.add('dropdown-open');
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                hoverTimeout = setTimeout(() => {
+                    item.classList.remove('dropdown-open');
+                }, 150);
+            });
+            
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isOpen = item.classList.contains('dropdown-open');
+                
+                navItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('dropdown-open');
+                    }
+                });
+                
+                item.classList.toggle('dropdown-open', !isOpen);
+            });
+        }
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-item')) {
+            navItems.forEach(item => {
+                item.classList.remove('dropdown-open');
+            });
+        }
+    });
+
+    // Enhanced navbar scroll effects
+    let lastScrollTop = 0;
+    let scrollTimeout;
+
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        clearTimeout(scrollTimeout);
+        
+        navbar.classList.add('scrolling');
+        
+        scrollTimeout = setTimeout(() => {
+            navbar.classList.remove('scrolling');
+        }, 150);
+        
+        if (scrollTop > 100) {
+            navbar.style.setProperty('--blur-intensity', '40px');
+        } else {
+            navbar.style.setProperty('--blur-intensity', '30px');
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+
+    // Add smooth loading animation
+    window.addEventListener('load', () => {
+        const navbar = document.getElementById('navbar');
+        navbar.style.animation = 'slideInDown 0.6s ease-out';
+    });
+
+    // Performance optimization
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) {
+        document.documentElement.style.setProperty('--transition', 'none');
+    }
+
+    // Add loading states for navigation links
+    document.querySelectorAll('.nav-link, .btn, .dropdown-item').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (this.href && !this.href.includes('#') && !e.metaKey && !e.ctrlKey) {
+                this.style.opacity = '0.7';
+                this.style.pointerEvents = 'none';
+                
+                setTimeout(() => {
+                    this.style.opacity = '';
+                    this.style.pointerEvents = '';
+                }, 3000);
+            }
+        });
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024 && isNavOpen) {
+            closeMobileNav();
+        }
+    });
+
+    // Add haptic feedback for mobile (if supported)
+    function addHapticFeedback() {
+        if ('vibrate' in navigator) {
+            navigator.vibrate(50);
+        }
+    }
+
+    // Add haptic feedback to key interactions
+    mobileMenuToggle.addEventListener('click', addHapticFeedback);
+    
+    document.querySelectorAll('.mobile-nav-links .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            addHapticFeedback();
+        });
+    });
+
+    // Improve accessibility
+    mobileNavSheet.setAttribute('role', 'dialog');
+    mobileNavSheet.setAttribute('aria-label', 'Navigation menu');
+    mobileNavSheet.setAttribute('aria-modal', 'true');
+
+    // Focus management
+    function trapFocus(element) {
+        const focusableElements = element.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        element.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstElement) {
+                        lastElement.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastElement) {
+                        firstElement.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+    }
+
+    // Apply focus trapping when sheet is opened
+    const originalToggle = toggleMobileNav;
+    toggleMobileNav = function() {
+        originalToggle();
+        if (isNavOpen) {
+            trapFocus(mobileNavSheet);
+            // Focus the first focusable element
+            const firstFocusable = mobileNavSheet.querySelector('a, button');
+            if (firstFocusable) {
+                setTimeout(() => firstFocusable.focus(), 100);
+            }
+        }
+    };
+</script>
+
+<!-- Add this div to your main template for proper spacing -->
+<div style="height: 6rem;"></div>

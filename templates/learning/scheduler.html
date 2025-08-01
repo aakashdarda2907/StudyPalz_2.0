@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Scheduler - StudyPalz</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --red-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-gray: #f8fafc;
+            --white: #ffffff;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 50%;
+            transform: translate(40px, -40px);
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            color: var(--medium-blue);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: var(--accent-gradient);
+            color: var(--white);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .form-select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .modules-container {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .modules-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .select-all-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-teal);
+            cursor: pointer;
+        }
+
+        .select-all-label {
+            font-weight: 600;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .modules-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .module-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--white);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+
+        .module-item:hover {
+            background: #f8fafc;
+            border-color: var(--primary-teal);
+        }
+
+        .module-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-teal);
+            cursor: pointer;
+        }
+
+        .module-label {
+            color: var(--dark-blue);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group-sm {
+            flex: 0 0 120px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--success-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .card { padding: 1.5rem; }
+            .form-row { flex-direction: column; align-items: stretch; }
+            .form-group-sm { flex: 1; }
+            .modules-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    
+    <div class="container">
+        <div class="card">
+            <h1 class="page-title">AI Study Scheduler</h1>
+            <p class="subtitle">Create a personalized study schedule based on your selected plan, modules, and exam date</p>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Step 1: Select Study Plan -->
+                <div class="form-section">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Select Study Plan</div>
+                    </div>
+                    <select name="study_plan" id="study_plan" required class="form-select">
+                        <option value="">-- Choose a Plan --</option>
+                        {% for plan in study_plans %}
+                            <option value="{{ plan.id }}">{{ plan.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Step 2: Select Modules -->
+                <div id="modules-container" class="form-section hidden">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Select Modules to Include</div>
+                    </div>
+                    <div class="modules-container">
+                        <div class="modules-header">
+                            <input type="checkbox" id="select-all-modules" class="select-all-checkbox">
+                            <label for="select-all-modules" class="select-all-label">Select All Modules</label>
+                        </div>
+                        <div id="modules-checkbox-list" class="modules-list"></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Set Dates -->
+                <div class="form-section">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Set Schedule Parameters</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exam_date" class="form-label">Exam Date</label>
+                            <input type="date" name="exam_date" id="exam_date" required class="form-input">
+                        </div>
+                        <div class="form-group-sm">
+                            <label for="backup_days" class="form-label">Backup Days</label>
+                            <input type="number" name="backup_days" id="backup_days" value="2" min="0" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    🗓️ Generate & Save Schedule
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const planSelector = document.getElementById('study_plan');
+        const modulesContainer = document.getElementById('modules-container');
+        const modulesListDiv = document.getElementById('modules-checkbox-list');
+        const selectAllCheckbox = document.getElementById('select-all-modules');
+        
+        // This is a simple way to pass data from Django to JS
+        const plansData = {
+            {% for plan in study_plans %}
+                "{{ plan.id }}": [
+                    {% for module in plan.module_set.all %}
+                        { "id": {{ module.id }}, "title": "{{ module.title }}" },
+                    {% endfor %}
+                ],
+            {% endfor %}
+        };
+
+        planSelector.addEventListener('change', function() {
+            const planId = this.value;
+            modulesListDiv.innerHTML = ''; // Clear previous list
+            
+            if (planId && plansData[planId]) {
+                modulesContainer.classList.remove('hidden');
+                plansData[planId].forEach(module => {
+                    const div = document.createElement('div');
+                    div.className = 'module-item';
+                    div.innerHTML = `
+                        <input type="checkbox" name="modules" value="${module.id}" id="module-${module.id}" class="module-checkbox">
+                        <label for="module-${module.id}" class="module-label">${module.title}</label>
+                    `;
+                    modulesListDiv.appendChild(div);
+                });
+                
+                // Reset select all checkbox
+                selectAllCheckbox.checked = false;
+            } else {
+                modulesContainer.classList.add('hidden');
+            }
+        });
+
+        selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = modulesListDiv.querySelectorAll('.module-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // Set minimum date to today
+        document.getElementById('exam_date').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

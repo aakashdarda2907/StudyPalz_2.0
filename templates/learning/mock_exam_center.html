@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Exam Center - StudyPalz</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --red-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-gray: #f8fafc;
+            --white: #ffffff;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .main-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 5vw, 2.75rem);
+            color: var(--dark-blue);
+            margin-bottom: 0.75rem;
+            background: var(--purple-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .subtitle {
+            color: var(--medium-blue);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark-blue);
+            font-size: 0.95rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+            color: var(--dark-blue);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--purple-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 1.25rem 2rem;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Empty State Styles */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px dashed #f59e0b;
+            border-radius: var(--border-radius);
+            color: var(--dark-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-state::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .empty-state > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--dark-blue);
+        }
+
+        .empty-state p {
+            color: var(--medium-blue);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Option styling */
+        .form-select option {
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Custom select styling for better consistency */
+        .form-select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            appearance: none;
+            padding-right: 3rem;
+        }
+
+        /* Feature highlights */
+        .feature-list {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary-teal);
+        }
+
+        .feature-list h4 {
+            color: var(--dark-blue);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            color: var(--medium-blue);
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-teal);
+            font-weight: bold;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .card { padding: 2rem 1.5rem; }
+            .page-title { font-size: 2rem; }
+            .empty-state { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    
+    <div class="container">
+        <div class="card main-card">
+            <h1 class="page-title"> AI Mock Exam Center</h1>
+            <p class="subtitle">
+                Select a study plan to generate a comprehensive mock exam. Our AI analyzes your entire performance history to create a personalized exam perfectly tailored to your learning needs.
+            </p>
+
+            <div class="feature-list">
+                <h4>🤖 What makes our AI exams special:</h4>
+                <ul>
+                    <li>Personalized questions based on your weak areas</li>
+                    <li>Adaptive difficulty matching your skill level</li>
+                    <li>Comprehensive performance analytics</li>
+                    <li>Multiple question formats for thorough assessment</li>
+                </ul>
+            </div>
+            
+            {% if study_plans %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="study_plan_select" class="form-label">📚 Select Study Plan</label>
+                    <select id="study_plan_select" name="study_plan" class="form-select">
+                        {% for plan in study_plans %}
+                        <option value="{{ plan.id }}">{{ plan.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="question_type" class="form-label">📝 Exam Format</label>
+                    <select name="question_type" id="question_type" class="form-select">
+                        <option value="mixed" selected>🎯 Mixed (MCQ & Open-Ended) - Recommended</option>
+                        <option value="multiple-choice">✅ Multiple-Choice Only</option>
+                        <option value="open-ended">💭 Open-Ended Only</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary pulse-animation">
+                    🚀 Generate My Personalized Mock Exam
+                </button>
+            </form>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <h3>No Study Plans Found</h3>
+                <p>Create your first study plan to unlock personalized mock exams tailored to your learning goals.</p>
+                <a href="{% url 'generate_plan' %}" class="btn btn-success">
+                    ✨ Create Your First Plan
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

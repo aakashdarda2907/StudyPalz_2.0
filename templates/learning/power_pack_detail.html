@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ power_pack.study_plan.title }} Power Pack</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --red-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-gray: #f8fafc;
+            --white: #ffffff;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--dark-blue);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary-teal-dark);
+            transform: translateX(-4px);
+        }
+
+        .back-link::before {
+            content: '←';
+            font-size: 1.2rem;
+        }
+
+        /* Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .meta-info {
+            color: var(--medium-blue);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-info::before {
+            content: '📅';
+            font-size: 1rem;
+        }
+
+        /* AI Insight Section */
+        .ai-insight {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            border-left: 6px solid #8b5cf6;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .ai-insight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 50%;
+            transform: translate(40px, -40px);
+        }
+
+        .ai-insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ai-insight-content {
+            color: var(--medium-blue);
+            font-size: 1rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Power Pack Content */
+        .power-pack-content {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        /* Enhanced content styling */
+        .power-pack-content h1 {
+            font-size: 2rem;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary-teal);
+            color: var(--dark-blue);
+        }
+
+        .power-pack-content h2 {
+            font-size: 1.5rem;
+            margin: 1.75rem 0 1rem 0;
+            color: var(--dark-blue);
+            padding-left: 1rem;
+            border-left: 4px solid var(--primary-teal);
+        }
+
+        .power-pack-content h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem 0;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .power-pack-content h4 {
+            font-size: 1.1rem;
+            margin: 1.25rem 0 0.5rem 0;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .power-pack-content p {
+            margin: 1rem 0;
+            color: var(--medium-blue);
+            line-height: 1.7;
+        }
+
+        .power-pack-content ul, .power-pack-content ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+            color: var(--medium-blue);
+        }
+
+        .power-pack-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .power-pack-content li::marker {
+            color: var(--primary-teal);
+        }
+
+        .power-pack-content strong {
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .power-pack-content em {
+            color: var(--primary-teal);
+            font-style: italic;
+        }
+
+        /* Code styling */
+        .power-pack-content code {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--dark-blue);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border-light);
+        }
+
+        .power-pack-content pre {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border: 1px solid #334155;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .power-pack-content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        /* Table styling */
+        .power-pack-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .power-pack-content th {
+            background: var(--accent-gradient);
+            color: var(--white);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .power-pack-content td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--medium-blue);
+        }
+
+        .power-pack-content tr:hover {
+            background: #f8fafc;
+        }
+
+        .power-pack-content tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Blockquote styling */
+        .power-pack-content blockquote {
+            border-left: 4px solid var(--primary-teal);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+            color: var(--medium-blue);
+            font-style: italic;
+        }
+
+        /* Links */
+        .power-pack-content a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 1px solid transparent;
+        }
+
+        .power-pack-content a:hover {
+            color: var(--primary-teal-dark);
+            border-bottom-color: var(--primary-teal-dark);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .card { padding: 1.5rem; }
+            .power-pack-content { padding: 1.5rem; }
+            .page-title { font-size: 1.75rem; }
+            
+            .power-pack-content h1 { font-size: 1.5rem; }
+            .power-pack-content h2 { font-size: 1.25rem; }
+            .power-pack-content h3 { font-size: 1.1rem; }
+            
+            .power-pack-content table {
+                font-size: 0.9rem;
+            }
+            
+            .power-pack-content th, .power-pack-content td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>{% include 'partials/navbar.html' %}</header>
+    
+    <main class="container">
+        <a href="{% url 'power_pack_list' %}" class="back-link">Back to all Power Packs</a>
+        
+        <div class="page-header">
+            <h1 class="page-title">Power Pack for: {{ power_pack.study_plan.title }}</h1>
+            <div class="meta-info">Generated on {{ power_pack.created_at|date:"F j, Y, P" }}</div>
+        </div>
+
+        <div class="card ai-insight">
+            <h3 class="ai-insight-header">
+                🧠 AI Insight
+            </h3>
+            <div class="ai-insight-content">
+                {{ power_pack.ai_insight }}
+            </div>
+        </div>
+
+        <div class="power-pack-content">
+            {{ html_content|safe }}
+        </div>
+    </main>
+</body>
+</html>

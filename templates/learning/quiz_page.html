@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Quiz for {{ lesson.title }}</title></head>
+<body>
+    {% include 'partials/navbar.html' %}
+    <main style="padding: 20px;">
+        <h1>Quiz: {{ lesson.quiz.title }}</h1>
+        {% if lesson.quiz and lesson.quiz.questions.all %}
+            <form action="{% url 'submit_quiz_view' lesson.id %}" method="post">
+                {% csrf_token %}
+                {% for question in lesson.quiz.questions.all %}
+                    <fieldset style="margin-bottom: 20px;">
+                        <legend><h4>{{ forloop.counter }}. {{ question.text }}</h4></legend>
+                        {% for answer in question.answers.all %}
+                            <div>
+                                <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}" id="answer_{{ answer.id }}" required>
+                                <label for="answer_{{ answer.id }}">{{ answer.text }}</label>
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                {% endfor %}
+                <button type="submit">Submit Answers</button>
+            </form>
+        {% else %}
+            <p>There are no questions in this quiz yet.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,639 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Progress Dashboard - StudyPalz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --light-teal: #f0fdff;
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-blue: #64748b;
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --white: #ffffff;
+            --light-gray: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .page-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--light-blue);
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-large);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            background: var(--accent-gradient);
+        }
+
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--light-gray);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 6px;
+            transition: width 0.8s ease-out;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-text {
+            text-align: right;
+            margin-top: 1rem;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+        }
+
+        .persona-card {
+            text-align: center;
+        }
+
+        .persona-avatar {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .persona-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .persona-description {
+            color: var(--medium-blue);
+            line-height: 1.6;
+        }
+
+        .mistake-highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .mistake-type {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #d97706;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-container {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .mastery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .mastery-card {
+            border-top: 4px solid;
+        }
+
+        .mastery-card.mastered { border-top-color: #10b981; }
+        .mastery-card.progress { border-top-color: var(--primary-teal); }
+        .mastery-card.unseen { border-top-color: var(--medium-blue); }
+
+        .mastery-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mastery-title.mastered { color: #10b981; }
+        .mastery-title.progress { color: var(--primary-teal); }
+        .mastery-title.unseen { color: var(--medium-blue); }
+
+        .topic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .topic-item.mastered {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #bbf7d0;
+        }
+
+        .topic-item.progress {
+            background: linear-gradient(135deg, var(--light-teal) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .topic-item.unseen {
+            background: linear-gradient(135deg, var(--light-gray) 0%, #f1f5f9 100%);
+            border: 1px solid var(--border-light);
+        }
+
+        .topic-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .topic-score {
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .topic-score.mastered {
+            background: #10b981;
+            color: white;
+        }
+
+        .topic-score.progress {
+            background: var(--primary-teal);
+            color: white;
+        }
+
+        .ai-insight {
+            background: linear-gradient(135deg, #f0f5ff 0%, #e0e7ff 100%);
+            border-left: 4px solid var(--primary-teal);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .ai-insight::before {
+            content: '🧠';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .ai-label {
+            font-weight: 700;
+            color: var(--primary-teal-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-text {
+            color: var(--medium-blue);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .back-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            background: var(--light-teal);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            transition: var(--transition);
+        }
+
+        .back-link a:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 1.5rem 0; }
+            .card { padding: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .mastery-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        {% include 'partials/navbar.html' %}
+    </header>
+
+    <main class="container main-content">
+        <div class="page-header">
+            <h1 class="page-title">My Progress Dashboard</h1>
+            <p class="page-subtitle">Your complete AI-powered learning analysis</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="card-icon">📊</span>
+                    Syllabus Completion
+                </h2>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ analytics_profile.progress_percent }}%;"></div>
+                    </div>
+                    <div class="progress-text">{{ analytics_profile.progress_percent }}%</div>
+                </div>
+                <div class="ai-insight">
+                    <div class="ai-label">💡 AI Insight</div>
+                    <div class="ai-text">This shows how many lessons you've officially completed by passing their quizzes. A great measure of your overall progress!</div>
+                </div>
+            </div>
+
+            <div class="card persona-card">
+                <h2 class="card-title">
+                    <span class="card-icon">🎭</span>
+                    Learning Persona
+                </h2>
+                <div class="persona-avatar">{{ analytics_profile.learning_persona.animal }}</div>
+                <div class="persona-name">{{ analytics_profile.learning_persona.name }}</div>
+                <div class="persona-description">{{ analytics_profile.learning_persona.description }}</div>
+                <div class="ai-insight">
+                    <div class="ai-label">💡 AI Insight</div>
+                    <div class="ai-text">I analyze your content interactions to find your style. This helps me give you better recommendations in your lessons.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="card-icon">⚠️</span>
+                    Common Mistake Pattern
+                </h2>
+                <div class="mistake-highlight">
+                    <div class="mistake-type">{{ analytics_profile.common_mistake|title }}</div>
+                    <div style="color: var(--medium-blue); font-size: 0.9rem;">Question Type</div>
+                </div>
+                <div class="ai-insight">
+                    <div class="ai-label">💡 AI Insight</div>
+                    <div class="ai-text">I analyze your incorrect answers to find patterns. I'll use this to give you more targeted questions in 'Adaptive' quizzes from the Practice Center.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--dark-blue); margin-bottom: 2rem;">Quiz Performance Over Time</h2>
+            <canvas id="quizHistoryChart"></canvas>
+            <div class="ai-insight">
+                <div class="ai-label">💡 AI Insight</div>
+                <div class="ai-text">This chart tracks your score on every quiz you take. Look for an upward trend! Dips are normal, especially on harder topics, but they show you where to focus your revision.</div>
+            </div>
+        </div>
+
+        <div>
+            <h2 style="font-size: 2rem; font-weight: 800; color: var(--dark-blue); margin-bottom: 2rem; text-align: center;">Topic Mastery Breakdown</h2>
+            
+            <div class="mastery-grid">
+                <div class="card mastery-card mastered">
+                    <h3 class="card-title mastery-title mastered">
+                        <span style="background: var(--success-gradient);" class="card-icon">✅</span>
+                        Mastered Topics (>80%)
+                    </h3>
+                    <div class="topic-list">
+                        {% for topic in analytics_profile.mastered_topics %}
+                            <div class="topic-item mastered">
+                                <span>{{ topic.lesson.title }}</span>
+                                <span class="topic-score mastered">{% widthratio topic.mastery_score 1 100 %}%</span>
+                            </div>
+                        {% empty %}
+                            <div style="text-align: center; color: var(--medium-blue); padding: 2rem;">No mastered topics yet. Keep studying!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card mastery-card progress">
+                    <h3 class="card-title mastery-title progress">
+                        <span class="card-icon">⚙️</span>
+                        Topics in Progress (1-79%)
+                    </h3>
+                    <div class="topic-list">
+                        {% for topic in analytics_profile.in_progress_topics %}
+                            <div class="topic-item progress">
+                                <span>{{ topic.lesson.title }}</span>
+                                <span class="topic-score progress">{% widthratio topic.mastery_score 1 100 %}%</span>
+                            </div>
+                        {% empty %}
+                            <div style="text-align: center; color: var(--medium-blue); padding: 2rem;">No topics in progress. Start a new lesson!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card mastery-card unseen">
+                    <h3 class="card-title mastery-title unseen">
+                        <span style="background: var(--medium-blue);" class="card-icon">🚀</span>
+                        Topics to Start
+                    </h3>
+                    <div class="topic-list">
+                        {% for topic in analytics_profile.unseen_topics %}
+                            <div class="topic-item unseen">
+                                <span>{{ topic.title }}</span>
+                            </div>
+                        {% empty %}
+                            <div style="text-align: center; color: var(--medium-blue); padding: 2rem;">You've started every lesson. Amazing!</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-insight">
+                <div class="ai-label">💡 AI Insight</div>
+                <div class="ai-text">This is the core of your learning profile. Focus on moving topics from "In Progress" to "Mastered" by taking quizzes in the <a href="{% url 'practice_center' %}" style="font-weight: 700; text-decoration: underline; color: var(--primary-teal);">Practice Center</a>. When you're ready for something new, pick from the "Topics to Start" list.</div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="{% url 'dashboard' %}">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </main>
+
+    <script>
+        const ctx = document.getElementById('quizHistoryChart');
+        const chartData = {{ analytics_profile.quiz_history_chart_data|safe }};
+
+        const labels = chartData.map(d => d.date);
+        const scores = chartData.map(d => d.score);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quiz Score %',
+                    data: scores,
+                    fill: true,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#06b6d4',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: '#06b6d4',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const quizTitle = chartData[context.dataIndex].quiz_title;
+                                return [
+                                    `Score: ${context.parsed.y}%`,
+                                    `Quiz: ${quizTitle}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)',
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            },
+                            color: '#64748b'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)',
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

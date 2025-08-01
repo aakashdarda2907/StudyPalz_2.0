@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Plan Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #06b6d4;
+            --primary-teal-dark: #0891b2;
+            --red-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --dark-blue: #0f172a;
+            --medium-blue: #334155;
+            --light-gray: #f8fafc;
+            --white: #ffffff;
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            background: var(--light-gray);
+        }
+
+        h1, h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: var(--dark-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--medium-blue);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-teal);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--red-gradient);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: var(--white);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .subject-badge {
+            display: inline-block;
+            background: var(--accent-gradient);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .module-card {
+            border: 2px solid var(--border-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f9fafb;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-item input {
+            flex: 1;
+        }
+
+        .keywords {
+            font-size: 0.8rem;
+            color: var(--medium-blue);
+            margin-top: 0.25rem;
+            padding-left: 0.5rem;
+        }
+
+        .section-divider {
+            border: none;
+            height: 2px;
+            background: var(--accent-gradient);
+            margin: 2rem 0;
+            border-radius: 1px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card { animation: slideUp 0.6s ease-out; }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .card { padding: 1.5rem; }
+            .actions { flex-direction: column; align-items: stretch; }
+            .actions .btn { width: 100%; }
+        }
+    </style>
+     {% include 'partials/navbar.html' %}
+</head>
+<body>
+    <div class="container">
+        <!-- Main Form Card -->
+        <div class="card">
+            <h1 class="page-title">Generate Study Plan</h1>
+            <p class="subtitle">Paste your course syllabus below to create a personalized study plan</p>
+            
+            <form method="post" action="{% url 'generate_plan' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Course Syllabus</label>
+                    <textarea name="syllabus_text" class="form-input textarea" 
+                              placeholder="Paste your full syllabus here...">{{ request.POST.syllabus_text }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Generate Plan
+                </button>
+            </form>
+        </div>
+
+        <!-- Edit Plan Section (shown when structured_syllabus exists) -->
+        {% if structured_syllabus %}
+        <hr class="section-divider">
+        
+        <div class="card">
+            <h2 class="page-title" style="font-size: 1.75rem;">Edit & Save Your Plan</h2>
+            
+            <div class="subject-badge">
+                {{ structured_syllabus.subject }}
+            </div>
+            
+            <form id="edit-plan-form" action="{% url 'save_plan' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="subject" value="{{ structured_syllabus.subject }}">
+                
+                <div class="form-group">
+                    <label class="form-label">Plan Title</label>
+                    <input type="text" name="plan_title" class="form-input"
+                           value="{{ structured_syllabus.modules.0.module_title }} Plan">
+                </div>
+
+                <div id="modules-container">
+                    {% for module in structured_syllabus.modules %}
+                    <div class="module-card">
+                        <div class="module-header">
+                            <label class="form-label">Module Title</label>
+                            <button type="button" onclick="this.closest('.module-card').remove()" 
+                                    class="btn btn-danger btn-sm">Delete</button>
+                        </div>
+                        
+                        <input type="text" name="module_title" class="form-input" 
+                               value="{{ module.module_title }}" required>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4 class="form-label">Lessons</h4>
+                            <div class="lessons-container">
+                                {% for lesson in module.lessons %}
+                                <div class="lesson-item">
+                                    <input type="text" name="module_{{ forloop.parentloop.counter0 }}_lessons" 
+                                           class="form-input" value="{{ lesson.lesson_title }}" required>
+                                    <button type="button" onclick="this.closest('.lesson-item').remove()" 
+                                            class="btn btn-danger btn-sm">×</button>
+                                </div>
+                                <div class="keywords">
+                                    <strong>Keywords:</strong> {{ lesson.keywords|join:", " }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm add-lesson-btn" 
+                                    data-module-index="{{ forloop.counter0 }}">+ Add Lesson</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="actions">
+                    <button type="button" id="add-module-btn" class="btn btn-secondary">
+                        + Add Module
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        Save Final Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let moduleCounter = {{ structured_syllabus.modules|length|default:0 }};
+        
+        document.addEventListener('click', function(e) {
+            // Add Lesson
+            if (e.target.classList.contains('add-lesson-btn')) {
+                const moduleIndex = e.target.dataset.moduleIndex;
+                const lessonsContainer = e.target.previousElementSibling;
+                const newLesson = document.createElement('div');
+                newLesson.className = 'lesson-item';
+                newLesson.innerHTML = `
+                    <input type="text" name="module_${moduleIndex}_lessons" 
+                           placeholder="New lesson title" class="form-input" required>
+                    <button type="button" onclick="this.closest('.lesson-item').remove()" 
+                            class="btn btn-danger btn-sm">×</button>
+                `;
+                lessonsContainer.appendChild(newLesson);
+            }
+            
+            // Add Module
+            if (e.target.id === 'add-module-btn') {
+                const container = document.getElementById('modules-container');
+                const newModule = document.createElement('div');
+                newModule.className = 'module-card';
+                newModule.innerHTML = `
+                    <div class="module-header">
+                        <label class="form-label">Module Title</label>
+                        <button type="button" onclick="this.closest('.module-card').remove()" 
+                                class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                    <input type="text" name="module_title" placeholder="New module title" 
+                           class="form-input" required>
+                    <div style="margin-top: 1.5rem;">
+                        <h4 class="form-label">Lessons</h4>
+                        <div class="lessons-container"></div>
+                        <button type="button" class="btn btn-secondary btn-sm add-lesson-btn" 
+                                data-module-index="${moduleCounter}">+ Add Lesson</button>
+                    </div>
+                `;
+                container.appendChild(newModule);
+                moduleCounter++;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Session: {{ deck_title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .flashcard.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.07);
+        }
+        .flashcard-front {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        .flashcard-back {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex flex-col min-h-screen">
+    {% include 'partials/navbar.html' %}
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-2xl">
+            <header class="text-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">{{ deck_title }}</h1>
+                <p id="progress-counter" class="text-lg text-gray-600">Card 1 of {{ review_cards|length }}</p>
+            </header>
+
+            {% for user_card in review_cards %}
+            <div id="card-{{ forloop.counter0 }}" class="flashcard-container {% if not forloop.first %}hidden{% endif %}" data-usercard-id="{{ user_card.id }}">
+                <div class="flashcard">
+                    <div class="flashcard-face flashcard-front">
+                        <p class="text-sm text-gray-500 mb-4">Question</p>
+                        <p class="text-2xl md:text-3xl text-center font-semibold text-gray-900">{{ user_card.flashcard.question }}</p>
+                    </div>
+                    <div class="flashcard-face flashcard-back">
+                        <p class="text-sm text-gray-500 mb-4">Answer</p>
+                        <p class="text-xl md:text-2xl text-center text-gray-700">{{ user_card.flashcard.answer }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div id="controls-show" class="mt-6 text-center">
+                <button onclick="flipCard()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-sync-alt mr-2"></i>Show Answer
+                </button>
+            </div>
+
+            <div id="controls-feedback" class="mt-6 text-center hidden">
+                <p class="text-gray-700 mb-3 font-semibold">Did you recall the answer correctly?</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="handleFeedback(false)" class="bg-red-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-600 transition-colors">
+                        <i class="fas fa-times mr-2"></i>No
+                    </button>
+                    <button onclick="handleFeedback(true)" class="bg-green-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-check mr-2"></i>Yes
+                    </button>
+                </div>
+            </div>
+            
+            <div id="completion-message" class="text-center mt-8 hidden">
+                <h2 class="text-2xl font-bold text-green-600">Review Complete!</h2>
+                <p class="text-gray-700 mt-2">You've finished this deck. Great work reinforcing your knowledge.</p>
+                <a href="{% url 'flashcard_dashboard' %}" class="mt-4 inline-block bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700">
+                    Back to Flashcard Center
+                </a>
+            </div>
+        </div>
+    </main>
+
+<script>
+    let currentCardIndex = 0;
+    const cards = document.querySelectorAll('.flashcard-container');
+    const totalCards = cards.length;
+    const progressCounter = document.getElementById('progress-counter');
+    const controlsShow = document.getElementById('controls-show');
+    const controlsFeedback = document.getElementById('controls-feedback');
+    const completionMessage = document.getElementById('completion-message');
+
+    function flipCard() {
+        const currentFlashcard = cards[currentCardIndex].querySelector('.flashcard');
+        currentFlashcard.classList.add('is-flipped');
+        controlsShow.classList.add('hidden');
+        controlsFeedback.classList.remove('hidden');
+    }
+
+    function handleFeedback(recalledCorrectly) {
+        const userCardId = cards[currentCardIndex].dataset.usercardId;
+        
+        // Send feedback to the server
+        fetch(`/review/card/${userCardId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'recalled_correctly': recalledCorrectly ? 'yes' : 'no'
+            })
+        });
+
+        // Move to the next card
+        setTimeout(nextCard, 300);
+    }
+
+    function nextCard() {
+        // Hide current card
+        cards[currentCardIndex].classList.add('hidden');
+        
+        currentCardIndex++;
+
+        if (currentCardIndex < totalCards) {
+            // Show next card
+            cards[currentCardIndex].classList.remove('hidden');
+            
+            // Reset state
+            const nextFlashcard = cards[currentCardIndex].querySelector('.flashcard');
+            nextFlashcard.classList.remove('is-flipped');
+            controlsShow.classList.remove('hidden');
+            controlsFeedback.classList.add('hidden');
+            
+            // Update counter
+            progressCounter.textContent = `Card ${currentCardIndex + 1} of ${totalCards}`;
+        } else {
+            // End of session
+            progressCounter.classList.add('hidden');
+            controlsFeedback.classList.add('hidden');
+            completionMessage.classList.remove('hidden');
+        }
+    }
+</script>
+
+</body>
+</html>
